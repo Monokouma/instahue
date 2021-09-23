@@ -16,7 +16,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         paddingVertical: 10,
         borderRadius: 4,
-        backgroundColor: '#7303c0',
+        backgroundColor: '#0F7173',
         width: 120,
         position: 'relative',
         right: 5,
@@ -27,7 +27,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         paddingVertical: 10,
         borderRadius: 4,
-        backgroundColor: '#7303c0',
+        backgroundColor: '#0F7173',
         width: 120,
         position: 'relative',
         left: 5,
@@ -38,7 +38,7 @@ const styles = StyleSheet.create({
         paddingTop: 30,
     },
     text: {
-        color: '#fafafa',
+        color: '#E7ECEF',
     },
 })
 
