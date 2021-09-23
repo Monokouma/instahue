@@ -8,7 +8,6 @@ const styles = StyleSheet.create({
         paddingTop: 70,
         alignItems: 'center',
     },
-
     logo: {
         width: 375,
         height: 300,
@@ -53,15 +52,12 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.25,
         shadowRadius: 4,
         elevation: 5,
-
     },
     buttonModal: {
         borderRadius: 4,
         padding: 10,
         elevation: 2,
-
     },
-
     buttonClose: {
         backgroundColor: "#F05D5E",
         left: 5
@@ -73,8 +69,6 @@ const styles = StyleSheet.create({
     buttonInModal: {
         flexDirection: "row-reverse",
         alignItems: 'center',
-
-
     },
     input: {
         height: 40,
@@ -91,17 +85,17 @@ const styles = StyleSheet.create({
     }
 });
 
-
 class InstagramPage extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            text: ''
+            text: '',
+            modalVisible: false,
         }
     }
 
     static picture;
-
+    static linkArray = []
 
     static async getUserProfile(instagramUsername) {
         console.log('coucou')
@@ -117,7 +111,7 @@ class InstagramPage extends Component {
 
         await axios.request(options).then(async function (response) {
             InstagramPage.picture = response.data.data;
-            await InstagramPage.consoleLog()
+            await InstagramPage.sortArrayPicture()
 
         }).catch(function (error) {
             console.error(error);
@@ -125,41 +119,35 @@ class InstagramPage extends Component {
 
     }
 
-    static async consoleLog() {
+    static sortArrayPicture() {
 
-        await console.log(InstagramPage.picture)
-        console.log('lop')
+        InstagramPage.picture.map((item) => {
+            console.log(item.images.square[3])
+            InstagramPage.linkArray = item.images.square[3]
+            console.log(InstagramPage.linkArray)
+            return <View>
+                <Image style={styles.logo}
+                        source={{uri: item.images.square[3]}}
+                >
+
+                </Image>
+            </View>
+        })
+
     }
 
-    static async controllerInsta() {
-        await InstagramPage.getUserProfile()
 
-    }
-
-
-
-    state = {
-        modalVisible: false,
-    }
-    stateTwo = {
-        modalVisibleTwo: false
-    }
     setModalVisible = (visible) => {
         this.setState({modalVisible: visible})
     }
-    setModalTwoVisible = (visibleTwo) => {
-        this.setState({modalVisibleTwo: visibleTwo})
-    }
+
     f1 = () => {
         let instagramUsername = this.state.text
-
         InstagramPage.getUserProfile(instagramUsername)
-
     }
-    //A FAIRE : SECOND MODAL APRES AVOIR ENTRE LE NOM D'UTILISATEUR
+
     render() {
         const {modalVisible} = this.state;
-        const {modalVisibleTwo} = this.stateTwo;
 
         return (
             <View style={styles.container}>
@@ -168,35 +156,17 @@ class InstagramPage extends Component {
                        source={{uri: 'https://i.imgur.com/ZYInR44.png'}}
                 />
 
-
                 <Modal
                     animationType="slide"
                     transparent={true}
                     visible={modalVisible}
                     onRequestClose={() => {
-
                         this.setModalVisible(!modalVisible)
-                    }
-                    }
+                    }}
                 >
                     <View style={styles.modal}>
                         <View style={styles.modalView}>
                             <Text id='test' style={styles.inText}>Enter your Instagram Username</Text>
-
-                            <Modal style={styles.modal}
-                                animationType="slide"
-                                transparent={true}
-                                visible={modalVisibleTwo}
-                                onRequestClose={() => {
-                                    this.setModalTwoVisible(!modalVisibleTwo)
-                                }}
-                            >
-                                <View style={styles.modalView}>
-                                    <Text style={styles.text}>OUI</Text>
-                                </View>
-
-                            </Modal>
-
                             <TextInput
                                 style={styles.input}
                                 onChangeText={text => this.setState({text})}
@@ -206,8 +176,6 @@ class InstagramPage extends Component {
                                     style={[styles.buttonModal, styles.buttonOpen]}
                                     onPress={() => {
                                         this.f1()
-                                        this.setModalTwoVisible(!modalVisibleTwo)
-
                                     }}
                                 >
                                     <Text style={styles.text}>Get feed picture</Text>
@@ -222,17 +190,13 @@ class InstagramPage extends Component {
                         </View>
                     </View>
                 </Modal>
-
-
                 <View style={styles.buttonContainer}>
                     <Pressable style={styles.button}
                                onPress={() => this.setModalVisible(!modalVisible)}
                     >
                         <Text style={styles.text}>Link Instagram</Text>
                     </Pressable>
-
                 </View>
-
             </View>
         );
     }
