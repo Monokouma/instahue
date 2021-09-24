@@ -91,11 +91,18 @@ class InstagramPage extends Component {
         this.state = {
             text: '',
             modalVisible: false,
+            secondaryModalVisible: false,
+            thirdModalVisible: false,
+            username: '',
+            numberOfPicture: '',
+            textTitle: '',
+
         }
     }
 
     static picture;
     static linkArray = []
+    static linkPic;
 
     static async getUserProfile(instagramUsername) {
         console.log('coucou')
@@ -115,6 +122,7 @@ class InstagramPage extends Component {
 
         }).catch(function (error) {
             console.error(error);
+
         });
 
     }
@@ -122,36 +130,60 @@ class InstagramPage extends Component {
     static sortArrayPicture() {
 
         InstagramPage.picture.map((item) => {
-            console.log(item.images.square[3])
-            InstagramPage.linkArray = item.images.square[3]
-            console.log(InstagramPage.linkArray)
-            return <View>
-                <Image style={styles.logo}
-                        source={{uri: item.images.square[3]}}
-                >
-
-                </Image>
-            </View>
+            //console.log(item.images.square);
+            InstagramPage.linkArray.push(item.images)
+            InstagramPage.linkPic = InstagramPage.linkArray[0].thumbnail
+            console.log(InstagramPage.linkPic)
         })
 
     }
 
-
     setModalVisible = (visible) => {
         this.setState({modalVisible: visible})
     }
+    setSecondaryModalVisible = (visible) => {
+        this.setState({secondaryModalVisible: visible})
+    }
+    setThirdModalVisible = (visible) => {
+        this.setState({thirdModalVisible: visible})
+    }
 
-    f1 = () => {
-        let instagramUsername = this.state.text
-        InstagramPage.getUserProfile(instagramUsername)
+
+    f1 = async () => {
+        let instagramUsername = this.state.text;
+
+        this.setState({
+            username: 'Fetching data please wait',
+            buttonInModal: false
+        })
+        await InstagramPage.getUserProfile(instagramUsername)
+        if (InstagramPage.linkArray.length === 0) {
+            this.setState({
+                username: 'Insta-Hue cant found your profile, did you enter the right name ? Your profile is in private ? You have one picture at least on your profile ?',
+                textTitle: '404',
+
+            })
+        } else {
+            this.setState({
+                username: 'Found :' + ' ' + instagramUsername + ' ' + ' account' + ' ' + 'and',
+                numberOfPicture: InstagramPage.linkArray.length + ' ' + 'pictures. Display it ?',
+                textTitle: instagramUsername,
+            })
+
+        }
     }
 
     render() {
         const {modalVisible} = this.state;
+        const {secondaryModalVisible} = this.state;
+        const {thirdModalVisible} = this.state;
+        const {textTitle} = this.state;
+        const {buttonInModal} = this.state;
+
 
         return (
             <View style={styles.container}>
-                <Text style={styles.instagramLabel}>Instagram Status :</Text>
+                <Text style={styles.instagramLabel}>Instagram Account Selected : {textTitle}</Text>
                 <Image style={styles.logo}
                        source={{uri: 'https://i.imgur.com/ZYInR44.png'}}
                 />
@@ -166,15 +198,70 @@ class InstagramPage extends Component {
                 >
                     <View style={styles.modal}>
                         <View style={styles.modalView}>
-                            <Text id='test' style={styles.inText}>Enter your Instagram Username</Text>
+                            <Text style={styles.inText}>Enter your Instagram Username (Profile must be public)</Text>
                             <TextInput
                                 style={styles.input}
                                 onChangeText={text => this.setState({text})}
                             />
+                            <Modal
+                                animationType="slide"
+                                transparent={true}
+                                visible={secondaryModalVisible}
+                                onRequestClose={() => {
+                                    this.setSecondaryModalVisible(!secondaryModalVisible)
+                                }}
+                            >
+                                <View style={styles.modal}>
+                                    <View style={styles.modalView}>
+                                        <Text
+                                            style={styles.inText}>{this.state.username} {this.state.numberOfPicture}</Text>
+
+                                        <Modal
+                                            animationType="slide"
+                                            transparent={true}
+                                            visible={thirdModalVisible}
+                                            onRequestClose={() => {
+                                                this.setThirdModalVisible(!thirdModalVisible)
+                                            }}
+                                        >
+                                            <View style={styles.modal}>
+                                                <View style={styles.modalView}>
+                                                    <Text style={styles.inText}>Oui</Text>
+                                                    <Image style={styles.logo}
+                                                           source={{uri: InstagramPage.linkPic}}
+                                                    />
+                                                </View>
+                                            </View>
+                                        </Modal>
+
+                                        <View style={styles.buttonInModal}>
+                                            <Pressable
+                                                visible={buttonInModal}
+                                                style={[styles.buttonModal, styles.buttonOpen]}
+                                                onPress={() => this.setThirdModalVisible(!thirdModalVisible)}
+                                            >
+                                                <Text>Yes</Text>
+                                            </Pressable>
+                                            <Pressable
+                                                visible={buttonInModal}
+                                                style={[styles.buttonModal, styles.buttonClose]}
+                                                onPress={() => this.setSecondaryModalVisible(!secondaryModalVisible)}
+                                            >
+                                                <Text>Cancel</Text>
+                                            </Pressable>
+                                        </View>
+                                    </View>
+                                </View>
+                            </Modal>
+
+
                             <View style={styles.buttonInModal}>
                                 <Pressable
                                     style={[styles.buttonModal, styles.buttonOpen]}
                                     onPress={() => {
+
+                                        this.setSecondaryModalVisible(!secondaryModalVisible)
+
                                         this.f1()
                                     }}
                                 >
@@ -200,6 +287,8 @@ class InstagramPage extends Component {
             </View>
         );
     }
+
+
 }
 
 export default InstagramPage;
